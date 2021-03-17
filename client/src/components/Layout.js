@@ -91,6 +91,12 @@ export default function ButtonAppBar() {
           <NavLink to='/senate' className={classes.navSpacing}>
             Senate
           </NavLink>
+          <NavLink to='/graphql' className={classes.navSpacing}>
+            GraphQL Example
+          </NavLink>
+          <NavLink to='/movies' className={classes.navSpacing}>
+            Movie CRUD Example
+          </NavLink>
           {
             authContext.isAuthenticated ? <Button color='inherit' onClick={handleAuth}>Logout</Button> :
             <Button color='inherit' onClick={handleAuth}>Login</Button>

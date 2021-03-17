@@ -86,10 +86,6 @@ const RickMortyViewer = () => {
 
     const characterList = data.characters.results
 
-    console.log(characterList)
-
-
-
     return (
         <>
         <form>
