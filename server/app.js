@@ -1,11 +1,13 @@
 import express from 'express'
-//import bodyParser from 'body-parser'
+import path from 'path'
 import { apiRouter } from './routes/api.route.js'
 import { productRouter } from './routes/product.route.js'
 import { movieRouter } from './routes/movie.route.js'
 import mongoose from 'mongoose'
 import * as dotenv from 'dotenv'
 import cors from 'cors'
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
 mongoose.set('useFindAndModify', false);
 
@@ -21,7 +23,9 @@ app.use(express.urlencoded({extended: true})) // url-encoded !== form-data
 
 app.use(express.json())
 
-app.use(express.static('public'))
+//app.use(express.static('public'))
+
+app.use(express.static(path.join(__dirname, '../client/build')))
 
 app.use('/api', apiRouter)
 

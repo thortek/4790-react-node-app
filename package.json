@@ -1,0 +1,25 @@
+{
+  "name": "4790-react-node-app",
+  "version": "1.0.0",
+  "description": "Combined React and Node app",
+  "main": "server/app.js",
+  "scripts": {
+    "install-server": "cd server && npm install",
+    "install-client": "cd client && npm install",
+    "seed": "cd server && node seed/loadIMDB.js",
+    "start-dev-server": "cd server && npm run start-dev",
+    "start-prod-server": "cd server && npm run start-prod",
+    "start-client": "cd client && npm run start",
+    "build-client": "cd client && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thortek/4790-react-node-app.git"
+  },
+  "author": "Thor Anderson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thortek/4790-react-node-app/issues"
+  },
+  "homepage": "https://github.com/thortek/4790-react-node-app#readme"
+}
