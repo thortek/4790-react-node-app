@@ -1,0 +1,51 @@
+$funkyBlue: #1a1ef7;
+$white: #fff;
+$cool-font: 'Arial', 'Helvetica', sans-serif;
+
+.column {
+    padding-left: 20px;
+    // width: 400px;
+}
+
+.senator {
+    width: 80%;
+    margin: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+    padding: 16px;
+    text-align: center;
+    background-color: $funkyBlue;
+    color: $white;
+}
+
+.emphasis {
+    font-size: larger;
+    color: darkblue;
+    font-style: italic;
+}
+
+div {
+    .column {
+        h2 {
+            font-weight: 900;
+        }
+    }
+}
+
+.card {
+    margin: 20px;
+    max-width: 350px;
+    min-height: 400px;
+}
+
+.cardActionArea {
+    display: flex !important;
+}
+
+.cardMedia {
+    max-width: 140px;
+}
+
+.containerGrid {
+    flex-grow: 1
+}
