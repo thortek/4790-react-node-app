@@ -11,6 +11,7 @@
     "postinstall": "cd client && npm install",
     "seed": "node seed/loadIMDB.js",
     "heroku-postbuild": "cd client && npm install && npm run build",
+    "build": "cd client && npm run build",
     "start-dev": "nodemon app.js",
     "start": "node app.js"
   },

@@ -28,7 +28,7 @@ import * as Yup from 'yup'
 import * as dotenv from 'dotenv'
 
 dotenv.config()
-const PORT = process.env.PORT || '5050'
+const PORT = process.env.PORT || 5050
 
 const useStyles = makeStyles(() => ({
   root: {
