@@ -25,6 +25,10 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
+import * as dotenv from 'dotenv'
+
+dotenv.config()
+const PORT = process.env.PORT || '5050'
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -74,7 +78,7 @@ const MovieList = () => {
     setDeleteOpen(false)
     console.log(selectedMovie._id)
     try {
-      await axios.delete(`http://localhost:5050/movie/delete`, {
+      await axios.delete(`http://localhost:${PORT}/movie/delete`, {
         data: {
           movieId: selectedMovie._id,
         },
@@ -96,7 +100,7 @@ const MovieList = () => {
 
   const handleUpdate = async (values) => {
     try {
-      const result = await axios.put(`http://localhost:5050/movie/update`, {
+      const result = await axios.put(`http://localhost:${PORT}/movie/update`, {
         data: {
           movieId: values.id,
           title: values.title,
@@ -126,7 +130,7 @@ const MovieList = () => {
 
   const fetchMovies = async () => {
     try {
-      const movies = await axios.get(`http://localhost:5050/movie`)
+      const movies = await axios.get(`http://localhost:${PORT}/movie`)
       setMovieList(movies.data)
     } catch (err) {
       console.error(err)
