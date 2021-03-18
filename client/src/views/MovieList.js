@@ -25,13 +25,6 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import * as dotenv from 'dotenv'
-
-dotenv.config()
-
-const port = process.env.PORT || 5050
-
-console.log(port)
 
 const useStyles = makeStyles(() => ({
   root: {
