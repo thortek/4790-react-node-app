@@ -78,7 +78,7 @@ const MovieList = () => {
     setDeleteOpen(false)
     console.log(selectedMovie._id)
     try {
-      await axios.delete(`http://localhost:${PORT}/movie/delete`, {
+      await axios.delete(`https://localhost:${PORT}/movie/delete`, {
         data: {
           movieId: selectedMovie._id,
         },
@@ -100,7 +100,7 @@ const MovieList = () => {
 
   const handleUpdate = async (values) => {
     try {
-      const result = await axios.put(`http://localhost:${PORT}/movie/update`, {
+      const result = await axios.put(`https://localhost:${PORT}/movie/update`, {
         data: {
           movieId: values.id,
           title: values.title,
@@ -130,7 +130,7 @@ const MovieList = () => {
 
   const fetchMovies = async () => {
     try {
-      const movies = await axios.get(`http://localhost:${PORT}/movie`)
+      const movies = await axios.get(`https://localhost:${PORT}/movie`)
       setMovieList(movies.data)
     } catch (err) {
       console.error(err)
