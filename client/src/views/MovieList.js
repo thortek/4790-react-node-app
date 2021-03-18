@@ -28,7 +28,10 @@ import * as Yup from 'yup'
 import * as dotenv from 'dotenv'
 
 dotenv.config()
-const PORT = process.env.PORT || 5050
+
+const port = process.env.PORT || 5050
+
+console.log(port)
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -78,7 +81,7 @@ const MovieList = () => {
     setDeleteOpen(false)
     console.log(selectedMovie._id)
     try {
-      await axios.delete(`https://localhost:${PORT}/movie/delete`, {
+      await axios.delete(`https://localhost:${port}/movie/delete`, {
         data: {
           movieId: selectedMovie._id,
         },
@@ -100,7 +103,7 @@ const MovieList = () => {
 
   const handleUpdate = async (values) => {
     try {
-      const result = await axios.put(`https://localhost:${PORT}/movie/update`, {
+      const result = await axios.put(`https://localhost:${port}/movie/update`, {
         data: {
           movieId: values.id,
           title: values.title,
@@ -130,7 +133,7 @@ const MovieList = () => {
 
   const fetchMovies = async () => {
     try {
-      const movies = await axios.get(`https://localhost:${PORT}/movie`)
+      const movies = await axios.get(`https://localhost:${port}/movie`)
       setMovieList(movies.data)
     } catch (err) {
       console.error(err)
