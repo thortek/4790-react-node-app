@@ -22,7 +22,7 @@ export const movies = async (req, res) => {
 }
 
 export const getMovieById = async (req, res) => {
-    const movieId = req.body.movieId
+    const movieId = req.body.data.movieId
     console.log(movieId)
     try {
         const movie = await Movie.findById(movieId)

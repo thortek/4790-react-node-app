@@ -8,12 +8,13 @@
     "node": "14.x"
   },
   "scripts": {
-    "postinstall": "cd client && npm install",
+    "postinstall": "cd client && yarn install",
     "seed": "node seed/loadIMDB.js",
-    "heroku-postbuild": "cd client && npm install && npm run build",
-    "build": "cd client && npm install && npm run build",
+    "heroku-postbuild": "cd client && yarn install && yarn run build",
+    "build": "yarn install && cd client && yarn install && yarn run build",
     "start-dev": "nodemon app.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "buildDocker": "docker build ."
   },
   "dependencies": {
     "axios": "^0.21.1",

@@ -1,7 +1,6 @@
 import express from 'express'
 import path from 'path'
 import { apiRouter } from './routes/api.route.js'
-import { productRouter } from './routes/product.route.js'
 import { movieRouter } from './routes/movie.route.js'
 import mongoose from 'mongoose'
 import * as dotenv from 'dotenv'
@@ -28,8 +27,6 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, '/client/build')))
 
 app.use('/api', apiRouter)
-
-app.use('/product', productRouter)
 
 app.use('/movie', movieRouter)
 
