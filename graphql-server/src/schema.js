@@ -16,26 +16,33 @@ const DateTime = asNexusMethod(GraphQLDateTime, 'date')
 const Query = objectType({
   name: 'Query',
   definition(t) {
-    t.nonNull.list.nonNull.field('allUsers', {
-      type: 'User',
+    t.nonNull.list.nonNull.field('allInstructors', {
+      type: 'Instructor',
       resolve: (_parent, _args, context) => {
-        return context.prisma.user.findMany()
+        return context.prisma.instructor.findMany()
       },
     })
 
-    t.nullable.field('postById', {
-      type: 'Post',
+    t.nonNull.list.nonNull.field('allCourses', {
+      type: 'Course',
+      resolve: (_parent, _args, context) => {
+        return context.prisma.course.findMany()
+      },
+    })
+
+    t.nullable.field('courseById', {
+      type: 'Course',
       args: {
         id: intArg(),
       },
       resolve: (_parent, args, context) => {
-        return context.prisma.post.findUnique({
+        return context.prisma.course.findUnique({
           where: { id: args.id || undefined },
         })
       },
     })
 
-    t.nonNull.list.nonNull.field('feed', {
+/*     t.nonNull.list.nonNull.field('feed', {
       type: 'Post',
       args: {
         searchString: stringArg(),
@@ -65,9 +72,9 @@ const Query = objectType({
           orderBy: args.orderBy || undefined,
         })
       },
-    })
+    }) */
 
-    t.list.field('draftsByUser', {
+    /* t.list.field('draftsByUser', {
       type: 'Post',
       args: {
         userUniqueInput: nonNull(
@@ -90,64 +97,56 @@ const Query = objectType({
             },
           })
       },
-    })
+    }) */
   },
 })
 
 const Mutation = objectType({
   name: 'Mutation',
   definition(t) {
-    t.nonNull.field('signupUser', {
-      type: 'User',
+  t.nonNull.field('createInstructor', {
+      type: 'Instructor',
       args: {
         data: nonNull(
           arg({
-            type: 'UserCreateInput',
+            type: 'InstructorCreateInput',
           }),
         ),
       },
       resolve: (_, args, context) => {
-        const postData = args.data.posts
-          ? args.data.posts.map((post) => {
-              return { title: post.title, content: post.content || undefined }
-            })
-          : []
-        return context.prisma.user.create({
+        return context.prisma.instructor.create({
           data: {
             name: args.data.name,
             email: args.data.email,
-            posts: {
-              create: postData,
-            },
           },
         })
       },
-    })
+    }) 
 
-    t.field('createDraft', {
-      type: 'Post',
+    t.field('createCourse', {
+      type: 'Course',
       args: {
         data: nonNull(
           arg({
-            type: 'PostCreateInput',
+            type: 'CourseCreateInput',
           }),
         ),
-        authorEmail: nonNull(stringArg()),
+        instructorEmail: nonNull(stringArg()),
       },
       resolve: (_, args, context) => {
-        return context.prisma.post.create({
+        return context.prisma.course.create({
           data: {
             title: args.data.title,
-            content: args.data.content,
-            author: {
-              connect: { email: args.authorEmail },
+            description: args.data.description,
+            instructor: {
+              connect: { email: args.instructorEmail },
             },
           },
         })
       },
     })
 
-    t.field('togglePublishPost', {
+    /* t.field('togglePublishPost', {
       type: 'Post',
       args: {
         id: nonNull(intArg()),
@@ -171,9 +170,9 @@ const Mutation = objectType({
           data: { published: !post.published },
         })
       },
-    })
+    }) */
 
-    t.field('incrementPostViewCount', {
+    /* t.field('incrementPostViewCount', {
       type: 'Post',
       args: {
         id: nonNull(intArg()),
@@ -188,65 +187,65 @@ const Mutation = objectType({
           },
         })
       },
-    })
+    }) */
 
-    t.field('deletePost', {
-      type: 'Post',
+    t.field('deleteCourse', {
+      type: 'Course',
       args: {
         id: nonNull(intArg()),
       },
       resolve: (_, args, context) => {
-        return context.prisma.post.delete({
+        return context.prisma.course.delete({
           where: { id: args.id },
         })
       },
     })
   },
-})
+}) 
 
-const User = objectType({
-  name: 'User',
+const Instructor = objectType({
+  name: 'Instructor',
   definition(t) {
     t.nonNull.int('id')
     t.string('name')
     t.nonNull.string('email')
-    t.nonNull.list.nonNull.field('posts', {
-      type: 'Post',
+    t.nonNull.list.nonNull.field('courses', {
+      type: 'Course',
       resolve: (parent, _, context) => {
-        return context.prisma.user
+        return context.prisma.instructor
           .findUnique({
             where: { id: parent.id || undefined },
           })
-          .posts()
+          .courses()
       },
     })
   },
 })
 
-const Post = objectType({
-  name: 'Post',
+const Course = objectType({
+  name: 'Course',
   definition(t) {
     t.nonNull.int('id')
     t.nonNull.field('createdAt', { type: 'DateTime' })
     t.nonNull.field('updatedAt', { type: 'DateTime' })
     t.nonNull.string('title')
-    t.string('content')
-    t.nonNull.boolean('published')
-    t.nonNull.int('viewCount')
-    t.field('author', {
-      type: 'User',
+    t.string('description')
+    t.string('defaultCredits')
+    t.string('courseCode')
+    t.field('instructor', {
+      type: 'Instructor',
       resolve: (parent, _, context) => {
-        return context.prisma.post
+        return context.prisma.course
           .findUnique({
             where: { id: parent.id || undefined },
           })
-          .author()
+          .instructor()
       },
     })
   },
 })
 
-const SortOrder = enumType({
+/* const SortOrder = enumType({
   name: 'SortOrder',
   members: ['asc', 'desc'],
 })
@@ -264,22 +263,22 @@ const UserUniqueInput = inputObjectType({
     t.int('id')
     t.string('email')
   },
-})
+})*/
 
-const PostCreateInput = inputObjectType({
-  name: 'PostCreateInput',
+const CourseCreateInput = inputObjectType({
+  name: 'CourseCreateInput',
   definition(t) {
     t.nonNull.string('title')
-    t.string('content')
+    t.string('description')
   },
 })
 
-const UserCreateInput = inputObjectType({
-  name: 'UserCreateInput',
+
+const InstructorCreateInput = inputObjectType({
+  name: 'InstructorCreateInput',
   definition(t) {
     t.nonNull.string('email')
     t.string('name')
-    t.list.nonNull.field('posts', { type: 'PostCreateInput' })
   },
 })
 
@@ -287,13 +286,13 @@ const schema = makeSchema({
   types: [
     Query,
     Mutation,
-    Post,
-    User,
-    UserUniqueInput,
-    UserCreateInput,
-    PostCreateInput,
-    SortOrder,
-    PostOrderByUpdatedAtInput,
+    Course,
+    Instructor,
+    // UserUniqueInput,
+    InstructorCreateInput,
+    CourseCreateInput,
+    // SortOrder,
+    // PostOrderByUpdatedAtInput,
     DateTime,
   ],
   outputs: {

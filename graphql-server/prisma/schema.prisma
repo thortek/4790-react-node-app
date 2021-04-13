@@ -3,25 +3,31 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-model User {
+// datasource db {
+//   provider = "sqlite"
+//   url      = "file:./dev.db"
+// }
+
+model Instructor {
   id    Int     @id @default(autoincrement())
   email String  @unique
   name  String?
-  posts Post[]
+  courses Course[]
 }
 
-model Post {
+model Course {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   title     String
-  content   String?
-  published Boolean  @default(false)
-  viewCount Int      @default(0)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+  description   String?
+  defaultCredits String?
+  courseCode  String?
+  //termsOffered String[]
+  instructor    Instructor?    @relation(fields: [instructorId], references: [id])
+  instructorId  Int?
 }

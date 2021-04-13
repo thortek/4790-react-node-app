@@ -8,11 +8,14 @@
     "node": "14.x"
   },
   "scripts": {
-    "postinstall": "cd client && yarn install",
+    "postinstall": "cd client && yarn install && cd ../graphql-server && yarn install",
+    "launch": "cd graphql-server && yarn nuke && yarn launchDocker",
+    "migrate": "cd graphql-server && yarn migrate",
+    "seed:uvu": "cd graphql-server && yarn seed:uvu",
     "seed": "node seed/loadIMDB.js",
     "heroku-postbuild": "cd client && yarn install && yarn run build",
     "build": "yarn install && cd client && yarn install && yarn run build",
-    "start-dev": "nodemon app.js",
+    "start-dev": "nodemon app.js && cd graphql-server && yarn dev",
     "start": "node app.js",
     "buildDocker": "docker build ."
   },
