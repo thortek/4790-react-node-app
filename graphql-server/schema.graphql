@@ -14,6 +14,8 @@ type Course {
 }
 
 input CourseCreateInput {
+  courseCode: String
+  defaultCredits: String
   description: String
   title: String!
 }
@@ -39,6 +41,7 @@ type Mutation {
   createCourse(data: CourseCreateInput!, instructorEmail: String!): Course
   createInstructor(data: InstructorCreateInput!): Instructor!
   deleteCourse(id: Int!): Course
+  updateCourse(data: CourseCreateInput!, id: Int!): Course
 }
 
 type Query {

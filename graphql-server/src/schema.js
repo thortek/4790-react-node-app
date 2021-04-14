@@ -172,22 +172,28 @@ const Mutation = objectType({
       },
     }) */
 
-    /* t.field('incrementPostViewCount', {
-      type: 'Post',
+    t.field('updateCourse', {
+      type: 'Course',
       args: {
         id: nonNull(intArg()),
+        data: nonNull(
+          arg({
+            type: 'CourseCreateInput',
+          }),
+        ),
       },
       resolve: (_, args, context) => {
-        return context.prisma.post.update({
+        return context.prisma.course.update({
           where: { id: args.id || undefined },
           data: {
-            viewCount: {
-              increment: 1,
-            },
+            title: args.data.title,
+            description: args.data.description,
+            defaultCredits: args.data.defaultCredits,
+            courseCode: args.data.courseCode,
           },
         })
       },
-    }) */
+    })
 
     t.field('deleteCourse', {
       type: 'Course',
@@ -270,6 +276,8 @@ const CourseCreateInput = inputObjectType({
   definition(t) {
     t.nonNull.string('title')
     t.string('description')
+    t.string('defaultCredits')
+    t.string('courseCode')
   },
 })
 

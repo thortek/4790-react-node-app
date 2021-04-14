@@ -97,6 +97,9 @@ export default function ButtonAppBar() {
           <NavLink to='/movies' className={classes.navSpacing}>
             Movie CRUD Example
           </NavLink>
+          <NavLink to='/courses' className={classes.navSpacing}>
+            Course Listings GraphQL Example
+          </NavLink>
           {
             authContext.isAuthenticated ? <Button color='inherit' onClick={handleAuth}>Logout</Button> :
             <Button color='inherit' onClick={handleAuth}>Login</Button>

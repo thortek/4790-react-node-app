@@ -9,18 +9,17 @@
   },
   "scripts": {
     "postinstall": "cd client && yarn install && cd ../graphql-server && yarn install",
-    "launch": "cd graphql-server && yarn nuke && yarn launchDocker",
+    "launch": "cd graphql-server && yarn launchDocker",
     "migrate": "cd graphql-server && yarn migrate",
     "seed:uvu": "cd graphql-server && yarn seed:uvu",
-    "seed": "node seed/loadIMDB.js",
-    "heroku-postbuild": "cd client && yarn install && yarn run build",
     "build": "yarn install && cd client && yarn install && yarn run build",
-    "start-dev": "nodemon app.js && cd graphql-server && yarn dev",
+    "start-dev": "concurrently --kill-others \"nodemon app.js\" \"cd graphql-server && npm run dev\" \"cd client && npm start\"",
     "start": "node app.js",
     "buildDocker": "docker build ."
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "concurrently": "^6.0.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

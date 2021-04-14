@@ -7,8 +7,13 @@ import { BrowserRouter } from 'react-router-dom'
 import AuthContextProvider from './contexts/AuthContext'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 
-const client = new ApolloClient({
+/* const client = new ApolloClient({
   uri: 'https://rickandmortyapi.com/graphql/',
+  cache: new InMemoryCache(),
+}) */
+
+const client = new ApolloClient({
+  uri: 'http://localhost:4000/graphql/',
   cache: new InMemoryCache(),
 })
 

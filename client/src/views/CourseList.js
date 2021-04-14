@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import _ from 'lodash'
+import { useQuery, gql } from '@apollo/client'
 import {
   Container,
   makeStyles,
@@ -19,10 +20,14 @@ import {
   TextField,
   DialogActions,
   Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 
@@ -41,13 +46,40 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  typeWidth: {
+    width: '100%',
+  },
 }))
 
-const MovieList = () => {
+const ALL_COURSES = gql`
+  query {
+    allCourses {
+      id
+      title
+      description
+      defaultCredits
+      courseCode
+    }
+  }
+`
+// query dog($breed: String!) {
+//   dog(breed: $breed) {
+//     id
+//     displayImage
+//   }
+// }
+
+/* const UPDATE_COURSE = gql`
+mutation updateCourse($id: Int!){
+  updateCourse(id: )
+}
+
+` */
+
+const CourseList = () => {
   const classes = useStyles()
-  const [selectedMovie, setSelectedMovie] = useState({ title: '' })
-  const [movieList, setMovieList] = useState([])
-  const [debouncedName, setDebouncedName] = useState('')
+  const [selectedCourse, setSelectedCourse] = useState({ title: '' })
+  const [debouncedTitle, setDebouncedTitle] = useState('')
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
@@ -57,36 +89,54 @@ const MovieList = () => {
 
   const debounce = useCallback(
     _.debounce((searchVal) => {
-      setDebouncedName(searchVal)
+      setDebouncedTitle(searchVal)
     }, 1000),
     [],
   )
 
-  const handleSearch = () => {
-    if (debouncedName) {
-      setMovieList(movieList.filter(movie => movie.title.includes(debouncedName)))
-    } else {
-      fetchMovies()
-    }
+  const { loading, error, data } = useQuery(ALL_COURSES)
+
+  if (loading) {
+    return (
+      <Container className={classes.root}>
+        <Typography className={classes.messages}>Loading...</Typography>
+      </Container>
+    )
   }
+
+  if (error) {
+    return (
+      <Typography className={classes.messages}>{`${error.message}`}</Typography>
+    )
+  }
+
+  const courseList = data.allCourses
+
+  /*  const handleSearch = () => {
+    if (debouncedTitle) {
+      setCourseList(courseList.filter(course => course.title.includes(debouncedTitle)))
+    } else {
+      //fetchCourses()
+    }
+  } */
 
   const handleDelete = async () => {
     setDeleteOpen(false)
-    console.log(selectedMovie._id)
+    console.log(selectedCourse._id)
     try {
-      await axios.delete(`http://localhost:5050/movie/delete`, {
+      await axios.delete(`/movie/delete`, {
         data: {
-          movieId: selectedMovie._id,
+          movieId: selectedCourse._id,
         },
       })
-      fetchMovies()
+      //fetchMovies()
     } catch (err) {
       console.error(err)
     }
   }
 
   const handleClickEditOpen = (movie) => {
-    setSelectedMovie(movie.movie)
+    setSelectedCourse(movie.movie)
     setEditOpen(true)
   }
 
@@ -96,7 +146,7 @@ const MovieList = () => {
 
   const handleUpdate = async (values) => {
     try {
-      const result = await axios.put(`http://localhost:5050/movie/update`, {
+      const result = await axios.put(`/movie/update`, {
         data: {
           movieId: values.id,
           title: values.title,
@@ -108,7 +158,7 @@ const MovieList = () => {
         },
       })
       if (result.status === 200) {
-        fetchMovies()
+        //fetchMovies()
       }
     } catch (err) {
       console.error(err)
@@ -116,7 +166,7 @@ const MovieList = () => {
   }
 
   const handleClickDeleteOpen = (movie) => {
-    setSelectedMovie(movie.movie)
+    setSelectedCourse(movie.movie)
     setDeleteOpen(true)
   }
 
@@ -124,10 +174,10 @@ const MovieList = () => {
     setDeleteOpen(false)
   }
 
-  const fetchMovies = async () => {
+  /*   const fetchMovies = async () => {
     try {
-      const movies = await axios.get(`http://localhost:5050/movie`)
-      setMovieList(movies.data)
+      const movies = await axios.get(`/movie`)
+      setCourseList(movies.data)
     } catch (err) {
       console.error(err)
     }
@@ -135,50 +185,61 @@ const MovieList = () => {
 
   useEffect(() => {
     fetchMovies()
-  }, [])
+  }, []) */
 
   return (
     <>
       <form>
         <Input placeholder='Search' onChange={handleInput} />
-        <IconButton aria-label='search' onClick={handleSearch}>
+        <IconButton aria-label='search'>
           <SearchIcon />
         </IconButton>
       </form>
       <Container className={classes.root}>
-        {movieList.map((movie) => {
+        {courseList.map((course) => {
           return (
-            <Card className={classes.card} key={movie._id}>
+            <Card className={classes.card} key={course.id}>
               <CardMedia
                 component='img'
                 height='300'
                 className={classes.media}
-                image={movie.image?.imageUrl}
-                title={movie.title}
+                image='/static/images/UVUSquareGreen-0001.png'
+                title={course.title}
               />
               <CardContent>
                 <Typography gutterBottom variant='h5' component='h2'>
-                  {movie.title}
+                  {course.title}
                 </Typography>
                 <Box className={classes.content}>
                   <Typography variant='subtitle1' color='textSecondary'>
-                    Year: {movie.year}
+                    Course Code: {course.courseCode}
                   </Typography>
                   <Typography variant='subtitle1' color='textSecondary'>
-                    Rank: {movie.rank}
+                    Credits: {course.defaultCredits}
                   </Typography>
                 </Box>
+
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Description</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography variant='body2' color='textSecondary'>
+                      Description: {course.description}
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
               </CardContent>
               <CardActions>
                 <IconButton
                   aria-label='edit'
-                  onClick={() => handleClickEditOpen({ movie })}
+                  onClick={() => handleClickEditOpen({ course })}
                 >
                   <EditIcon />
                 </IconButton>
                 <IconButton
                   aria-label='delete'
-                  onClick={() => handleClickDeleteOpen({ movie })}
+                  onClick={() => handleClickDeleteOpen({ course })}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -194,24 +255,18 @@ const MovieList = () => {
       >
         <Formik
           initialValues={{
-            title: selectedMovie?.title,
-            rank: selectedMovie?.rank,
-            imageUrl: selectedMovie?.image?.imageUrl,
-            height: selectedMovie?.image?.height,
-            width: selectedMovie?.image?.width,
-            id: selectedMovie?._id,
-            year: selectedMovie?.year,
+            title: selectedCourse?.title,
+            credits: selectedCourse?.defaultCredits,
+            description: selectedCourse?.description,
+            code: selectedCourse?.courseCode,
           }}
           validationSchema={Yup.object().shape({
-            title: Yup.string('Enter movie title.').required(
+            title: Yup.string('Enter course title.').required(
               'Title is required',
             ),
-            rank: Yup.number('Movie rank number'),
-            height: Yup.number('Height'),
-            imageUrl: Yup.string('Image URL'),
-            width: Yup.number('Width'),
-            id: Yup.string('ID').required('ID is required.'),
-            year: Yup.string('Year'),
+            credits: Yup.number('Course credits number'),
+            description: Yup.string('Course description'),
+            code: Yup.string('Course code'),
           })}
           onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
             try {
@@ -243,13 +298,13 @@ const MovieList = () => {
               <DialogTitle id='edit-dialog-title'>Edit Movie</DialogTitle>
               <DialogContent>
                 <DialogContentText>
-                  Make changes below to the data about this movie:
+                  Make changes below to the data about this course:
                 </DialogContentText>
                 <TextField
                   autoFocus
                   id='title'
                   name='title'
-                  label='Movie Title'
+                  label='Course Title'
                   type='text'
                   fullWidth
                   value={values.title}
@@ -261,68 +316,42 @@ const MovieList = () => {
                 <Box className={classes.content}>
                   <TextField
                     autoFocus
-                    id='year'
-                    name='year'
-                    label='Year'
-                    type='text'
-                    value={values.year}
+                    id='credits'
+                    name='credits'
+                    label='Credits'
+                    type='number'
+                    value={values.credits}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={Boolean(touched.year && errors.year)}
-                    helperText={touched.year && errors.year}
+                    error={Boolean(touched.credits && errors.credits)}
+                    helperText={touched.credits && errors.credits}
                   />
                   <TextField
                     autoFocus
-                    name='rank'
-                    id='rank'
-                    label='Rank'
-                    type='number'
-                    value={values.rank}
+                    name='code'
+                    id='code'
+                    label='Code'
+                    type='text'
+                    value={values.code}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={Boolean(touched.rank && errors.rank)}
-                    helperText={touched.rank && errors.rank}
+                    error={Boolean(touched.code && errors.code)}
+                    helperText={touched.code && errors.code}
                   />
                 </Box>
                 <TextField
                   autoFocus
-                  id='imageUrl'
-                  name='imageUrl'
-                  label='Image URL'
+                  id='description'
+                  name='description'
+                  label='Course Description'
                   type='text'
                   fullWidth
-                  value={values.imageUrl}
+                  value={values.description}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={Boolean(touched.imageUrl && errors.imageUrl)}
-                  helperText={touched.imageUrl && errors.imageUrl}
+                  error={Boolean(touched.description && errors.description)}
+                  helperText={touched.description && errors.description}
                 />
-                <Box className={classes.content}>
-                  <TextField
-                    autoFocus
-                    id='height'
-                    name='height'
-                    label='Height'
-                    type='number'
-                    value={values.height}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(touched.height && errors.height)}
-                    helperText={touched.height && errors.height}
-                  />
-                  <TextField
-                    autoFocus
-                    id='width'
-                    name='width'
-                    label='Width'
-                    type='number'
-                    value={values.width}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(touched.width && errors.width)}
-                    helperText={touched.width && errors.width}
-                  />
-                </Box>
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleCloseEdit} color='primary'>
@@ -337,10 +366,10 @@ const MovieList = () => {
         </Formik>
       </Dialog>
       <Dialog open={deleteOpen} onClose={handleCloseDelete}>
-        <DialogTitle>Delete Movie</DialogTitle>
+        <DialogTitle>Delete Course</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this movie?
+            Are you sure you want to delete this course?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -356,4 +385,4 @@ const MovieList = () => {
   )
 }
 
-export default MovieList
+export default CourseList
