@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import _ from 'lodash'
-import { useQuery, gql } from '@apollo/client'
+import { useQuery, useMutation, gql } from '@apollo/client'
 import {
   Container,
   makeStyles,
@@ -62,19 +62,29 @@ const ALL_COURSES = gql`
     }
   }
 `
-// query dog($breed: String!) {
-//   dog(breed: $breed) {
-//     id
-//     displayImage
-//   }
-// }
 
-/* const UPDATE_COURSE = gql`
-mutation updateCourse($id: Int!){
-  updateCourse(id: )
+const UPDATE_COURSE = gql`
+mutation updateCourse ($id: Int!, $title: String!, $description: String, $defaultCredits: String, $courseCode: String) {
+  updateCourse (id: $id,
+    data: { 
+    title: $title,
+    description: $description,
+    defaultCredits: $defaultCredits,
+    courseCode: $courseCode,
+    }
+  ) {
+      id
+  }
 }
+`
 
-` */
+const DELETE_COURSE = gql`
+mutation deleteCourse ($id: Int!) {
+  deleteCourse (id: $id) {
+    id
+  }
+}
+`
 
 const CourseList = () => {
   const classes = useStyles()
@@ -95,6 +105,8 @@ const CourseList = () => {
   )
 
   const { loading, error, data } = useQuery(ALL_COURSES)
+  const [updateCourse] = useMutation(UPDATE_COURSE);
+  const [deleteCourse] = useMutation(DELETE_COURSE)
 
   if (loading) {
     return (
@@ -122,21 +134,16 @@ const CourseList = () => {
 
   const handleDelete = async () => {
     setDeleteOpen(false)
-    console.log(selectedCourse._id)
+    console.log(selectedCourse.id)
     try {
-      await axios.delete(`/movie/delete`, {
-        data: {
-          movieId: selectedCourse._id,
-        },
-      })
-      //fetchMovies()
+      deleteCourse({ variables: { id: selectedCourse.id } })
     } catch (err) {
       console.error(err)
     }
   }
 
-  const handleClickEditOpen = (movie) => {
-    setSelectedCourse(movie.movie)
+  const handleClickEditOpen = (course) => {
+    setSelectedCourse(course.course)
     setEditOpen(true)
   }
 
@@ -145,47 +152,26 @@ const CourseList = () => {
   }
 
   const handleUpdate = async (values) => {
-    try {
-      const result = await axios.put(`/movie/update`, {
-        data: {
-          movieId: values.id,
+      updateCourse({
+        variables: {
+          id: selectedCourse.id,
           title: values.title,
-          rank: values.rank,
-          year: values.year,
-          imageUrl: values.imageUrl,
-          height: values.height,
-          width: values.width,
-        },
+          defaultCredits: values.defaultCredits,
+          courseCode: values.courseCode,
+          description: values.description
+        }
       })
-      if (result.status === 200) {
-        //fetchMovies()
-      }
-    } catch (err) {
-      console.error(err)
-    }
   }
+  
 
-  const handleClickDeleteOpen = (movie) => {
-    setSelectedCourse(movie.movie)
+  const handleClickDeleteOpen = (course) => {
+    setSelectedCourse(course.course)
     setDeleteOpen(true)
   }
 
   const handleCloseDelete = () => {
     setDeleteOpen(false)
   }
-
-  /*   const fetchMovies = async () => {
-    try {
-      const movies = await axios.get(`/movie`)
-      setCourseList(movies.data)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  useEffect(() => {
-    fetchMovies()
-  }, []) */
 
   return (
     <>
@@ -256,17 +242,17 @@ const CourseList = () => {
         <Formik
           initialValues={{
             title: selectedCourse?.title,
-            credits: selectedCourse?.defaultCredits,
+            defaultCredits: selectedCourse?.defaultCredits,
             description: selectedCourse?.description,
-            code: selectedCourse?.courseCode,
+            courseCode: selectedCourse?.courseCode,
           }}
           validationSchema={Yup.object().shape({
             title: Yup.string('Enter course title.').required(
               'Title is required',
             ),
-            credits: Yup.number('Course credits number'),
+            defaultCredits: Yup.string('Course credits number'),
             description: Yup.string('Course description'),
-            code: Yup.string('Course code'),
+            courseCode: Yup.string('Course code'),
           })}
           onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
             try {
@@ -316,27 +302,27 @@ const CourseList = () => {
                 <Box className={classes.content}>
                   <TextField
                     autoFocus
-                    id='credits'
-                    name='credits'
+                    id='defaultCredits'
+                    name='defaultCredits'
                     label='Credits'
-                    type='number'
-                    value={values.credits}
+                    type='text'
+                    value={values.defaultCredits}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={Boolean(touched.credits && errors.credits)}
-                    helperText={touched.credits && errors.credits}
+                    error={Boolean(touched.defaultCredits && errors.defaultCredits)}
+                    helperText={touched.defaultCredits && errors.defaultCredits}
                   />
                   <TextField
                     autoFocus
-                    name='code'
-                    id='code'
+                    name='courseCode'
+                    id='courseCode'
                     label='Code'
                     type='text'
-                    value={values.code}
+                    value={values.courseCode}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={Boolean(touched.code && errors.code)}
-                    helperText={touched.code && errors.code}
+                    error={Boolean(touched.courseCode && errors.courseCode)}
+                    helperText={touched.courseCode && errors.courseCode}
                   />
                 </Box>
                 <TextField
@@ -369,7 +355,7 @@ const CourseList = () => {
         <DialogTitle>Delete Course</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this course?
+            Are you sure you want to delete the course {selectedCourse?.title}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
