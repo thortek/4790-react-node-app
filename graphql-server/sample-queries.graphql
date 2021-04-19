@@ -26,3 +26,56 @@ query allInstructors {
         }
       }
     }
+
+    mutation createInstructor {
+  createInstructor(
+    data: { 
+      name: "Bob", 
+      email: "bob@prisma.io" }
+  ) {
+    id
+  }
+}
+
+mutation deleteCourse {
+  deleteCourse(id: 5) {
+    title
+    id
+  }
+}
+
+mutation updateCourse {
+  updateCourse(id: 1, data: {
+    title: "Test Course",
+    description: "Test course description goes here",
+    defaultCredits: "3",
+    courseCode: "DGM 9000"
+  }) {
+    id
+    title
+  }
+}
+
+mutation updateCourse2 ($id: Int!, 
+  $title: String!, 
+  $description: String, 
+  $defaultCredits: String, 
+  $courseCode: String!) {
+  updateCourse (id: $id,
+    data: {
+      title: $title,
+    description: $description,
+    defaultCredits: $defaultCredits,
+    courseCode: $courseCode,
+    }
+  ) {
+      id
+  }
+}
+# example object for variables in playground
+{"id": 1,
+  "title": "Thor Course",
+  "description": "Sample Description",
+  "courseCode": "THOR001",
+  "defaultCredits": "3"
+}
