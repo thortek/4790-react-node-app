@@ -15,7 +15,8 @@
     "migrate": "npx prisma migrate dev --name init",
     "seed": "npx prisma db seed --preview-feature",
     "seed:uvu": "node prisma/seed/seedUVUCourses.js",
-    "dev": "nodemon src/server.js"
+    "start-dev": "npm run migrate && sleep 5 && npm run seed:uvu && sleep 5 && nodemon src/server.js",
+    "start": "npm run migrate && nodemon src/server.js"
   },
   "devDependencies": {
     "nodemon": "2.0.7",
